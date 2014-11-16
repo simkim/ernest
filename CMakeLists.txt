@@ -4,7 +4,7 @@ project(ernest)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS rospy message_generation std_msgs)
+find_package(catkin REQUIRED COMPONENTS rospy message_generation std_msgs actionlib actionlib_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -51,19 +51,21 @@ add_service_files(
    FILES
    SetMood.srv
    GetMood.srv
+   ServoAngle.srv
  )
 
 ## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
+add_action_files(
+   DIRECTORY action
+   FILES SetJointPosition.action
 #   Action2.action
-# )
+)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
    DEPENDENCIES
    std_msgs  # Or other packages containing msgs
+   actionlib_msgs
 )
 
 ###################################
@@ -78,7 +80,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ernest_main
-CATKIN_DEPENDS message_runtime rospy std_msgs
+CATKIN_DEPENDS message_runtime rospy std_msgs actionlib actionlib_msgs
 #  DEPENDS system_lib
 )
 
@@ -123,6 +125,8 @@ ${catkin_INCLUDE_DIRS}
 
 install(PROGRAMS
    scripts/brain.py
+   scripts/sensors.py
+   scripts/body.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

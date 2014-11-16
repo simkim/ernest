@@ -1,0 +1,5 @@
+<launch>
+  <node name="body" pkg="ernest" type="body.py" />
+  <node name="sensors" pkg="ernest" type="sensors.py" />
+  <node name="brain" pkg="ernest" type="brain.py" />
+</launch>
