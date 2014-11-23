@@ -1,5 +1,7 @@
 <launch>
-  <node name="body" pkg="ernest" type="body.py" />
-  <node name="sensors" pkg="ernest" type="sensors.py" />
-  <node name="brain" pkg="ernest" type="brain.py" />
+  <node name="ernest_body" pkg="ernest" type="body.py" output="screen"/>
+  <node name="ernest_sensors" pkg="ernest" type="sensors.py" />
+  <node name="ernest_brain" pkg="ernest" type="brain.py" />
+  <node name="ernest_mouth" pkg="ernest" type="mouth.py" output="screen"/>
+  <node name="ernest_logic" pkg="ernest" type="logic.py" output="screen"/>
 </launch>

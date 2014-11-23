@@ -12,8 +12,11 @@ class ArduinoCommunicator:
 		self.ser = Serial('/dev/ernesthead', 115200)
 	def loop(self):
 		while True:
-			line = self.ser.readline()
-			yield line.strip()
+			try:
+				line = self.ser.readline()
+				yield line.strip()
+			except:
+				return
 		
 def main():
 	pub = rospy.Publisher('ernest_sensors/imu', Imu, queue_size=10)

@@ -3,6 +3,9 @@ from smach import State, StateMachine
 import smach_ros
 import rospy
 import time
+import threading
+from dynamixel_msgs.msg import MotorState
+from ernest.srv import StringAndResult, ServoAngle
 
 class PrototypeState(State):
 	def wait(self, sleep_time, msg):
@@ -13,16 +16,37 @@ class PrototypeState(State):
 class Sleeping(PrototypeState):
 	def __init__(self):
 		State.__init__(self, outcomes=['sensing'], output_keys=['interest'])
+		self.sleep_condition = threading.Condition()
+	def check_head(self, req):
+		self.sleep_condition.acquire()
+		if req.load > 20 or req.load < -20:
+			rospy.loginfo("Some load applied to head, wake up")
+			self.sleep_condition.notify()
+			self.head_subscriber.unregister()
+		self.sleep_condition.release()	
+	def request_preempt(self):
+		self.sleep_condition.acquire()
+		self.sleep_condition.notify()
+		self.sleep_condition.release()
+		State.request_preempt(self)
 	def execute(self, ud):
-		self.wait(3, 'Sleeping')
+		self.sleep_condition.acquire()
+		self.head_subscriber = rospy.Subscriber("/ernest_body/motors/head", MotorState, self.check_head)
+		self.sleep_condition.wait()
 		ud['interest'] = 2
+		self.sleep_condition.release()
 		return 'sensing'
 
 class Greet(PrototypeState):
 	def __init__(self):
 		State.__init__(self, outcomes=['success'], io_keys=['interest'])
+		self.set_head_angle = rospy.ServiceProxy('ernest_body/set_head_angle', ServoAngle)
+		self.say = rospy.ServiceProxy('ernest_mouth/say', StringAndResult)
 	def execute(self, ud):
-		self.wait(5, 'Greeting')
+		rospy.loginfo("Greeting")
+		self.set_head_angle(10)
+		self.say("Salut")
+		self.set_head_angle(-10)
 		ud['interest'] -= 1		
 		return 'success'
 
@@ -84,9 +108,18 @@ def main():
 	sm = create_ernest_sm()
 	sis = smach_ros.IntrospectionServer('ernest_logic', sm, '/SM_ROOT')
 	sis.start()
-	outcome = sm.execute()
+	smach_thread = threading.Thread(target=sm.execute)
+	smach_thread.start()
+	# Wait for ctrl-c
 	rospy.spin()
+	print "ctrl-c"
+	# Request the container to preempt
+	sm.request_preempt()
 	sis.stop()
+
+	# Block until everything is preempted 
+	# (you could do something more complicated to get the execution outcome if you want it)
+	smach_thread.join()
 
 if __name__ == '__main__':
 	main()
