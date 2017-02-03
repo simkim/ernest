@@ -1,10 +1,10 @@
 #!/usr/bin/python
-from smach import State
 import rospy
 import time
 import threading
 from dynamixel_msgs.msg import MotorState
 from ernest.srv import StringAndResult, ServoAngle
+from smach import State
 
 
 class PrototypeState(State):

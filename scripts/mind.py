@@ -2,7 +2,8 @@
 import smach_ros
 import rospy
 import threading
-
+import ernest
+import ernest.logic
 from ernest.logic.statemachine import create_ernest_sm
 
 

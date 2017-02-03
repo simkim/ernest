@@ -128,6 +128,8 @@ install(PROGRAMS
    scripts/brain.py
    scripts/sensors.py
    scripts/body.py
+   scripts/mouth.py
+   scripts/mind.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
