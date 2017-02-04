@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from smach import StateMachine
-from ernest.logic.states import ActiveState, DoNothing, DoSomething, Greet
+from ernest.logic.states import ActiveState, DoNothing, DoSomething, Greet, ShakeHands
 from ernest.logic.states import Sleeping
 
 
@@ -19,10 +19,13 @@ def create_awake_sm():
                                       'bored': 'bored'})
         StateMachine.add('DO_SOMETHING', DoSomething(),
                          transitions={'greet': 'GREET',
+                                      'shake_hands': 'SHAKE_HANDS',
                                       'failure': 'DO_NOTHING'})
         StateMachine.add('DO_NOTHING', DoNothing(),
                          transitions={'success': 'ACTIVE'})
         StateMachine.add('GREET', Greet(),
+                         transitions={'success': 'ACTIVE'})
+        StateMachine.add('SHAKE_HANDS', ShakeHands(),
                          transitions={'success': 'ACTIVE'})
     return awake_sm
 

@@ -6,9 +6,10 @@ import rospy
 
 def say(req):
     print "Say %s" % req.string
-    system("pico2wave -l fr-FR -w /tmp/ernest_say.wav \"%s\"" % req.string)
-    system("play -q /tmp/ernest_say.wav \
-           gain -0.15 pitch -200.0 gain -0.1 tempo -s 1.6")
+    system("pico2wave -l en-US -w /tmp/ernest_say.wav \"%s\"" % req.string)
+    system("play -q /tmp/ernest_say.wav ")
+#   system("play -q /tmp/ernest_say.wav \
+#     gain -0.15 pitch -200.0 gain -0.1 tempo -s 1.6")
     return "ok"
 
 

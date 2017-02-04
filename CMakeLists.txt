@@ -125,7 +125,7 @@ ${catkin_INCLUDE_DIRS}
 ## in contrast to setup.py, you can choose the destination
 
 install(PROGRAMS
-   scripts/brain.py
+   scripts/soul.py
    scripts/sensors.py
    scripts/body.py
    scripts/mouth.py

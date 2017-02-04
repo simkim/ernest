@@ -28,7 +28,8 @@ class Sleeping(PrototypeState):
         self.sleep_condition.release()
 
     def check_head(self, req):
-        if req.load > 20 or req.load < -20:
+        #rospy.loginfo("Head load is %s" % req.load)
+        if req.load > 25 or req.load < -25:
             rospy.loginfo("Some load applied to head, wake up")
             self.wakeup()
 
@@ -56,19 +57,45 @@ class Greet(PrototypeState):
     def execute(self, ud):
         rospy.loginfo("Greeting")
         self.set_head_angle(10)
-        self.say("Salut")
+        self.say("Hello world")
         self.set_head_angle(-10)
+        ud['interest'] -= 1
+        return 'success'
+
+class ShakeHands(PrototypeState):
+    def __init__(self):
+        State.__init__(self, outcomes=['success'], io_keys=['interest'])
+        self.set_rshoulder_angle = rospy.ServiceProxy(
+            'ernest_body/set_rshoulder_angle', ServoAngle)
+        self.set_lshoulder_angle = rospy.ServiceProxy(
+            'ernest_body/set_lshoulder_angle', ServoAngle)
+
+    def execute(self, ud):
+        rospy.loginfo("ShakeHands")
+        self.set_rshoulder_angle(60)
+        self.set_lshoulder_angle(-60)
+        self.wait(0.2, "Wait my shoulder")
+        self.set_rshoulder_angle(0)
+        self.set_lshoulder_angle(0)
+        self.wait(0.2, "Wait my shoulder")
+        self.set_rshoulder_angle(60)
+        self.set_lshoulder_angle(-60)
+        self.wait(0.2, "Wait my shoulder")
+        self.set_rshoulder_angle(0)
+        self.set_lshoulder_angle(0)
+        self.wait(0.2, "Wait my shoulder")
+
         ud['interest'] -= 1
         return 'success'
 
 
 class DoSomething(PrototypeState):
     def __init__(self):
-        State.__init__(self, outcomes=['greet', 'failure'])
+        State.__init__(self, outcomes=['greet', 'shake_hands', 'failure'])
 
     def execute(self, ud):
-        self.wait(1, "What could I do ?")
-        return 'greet'
+        self.wait(1, "What could I do ? shake ?")
+        return 'shake_hands'
 
 
 class DoNothing(PrototypeState):
